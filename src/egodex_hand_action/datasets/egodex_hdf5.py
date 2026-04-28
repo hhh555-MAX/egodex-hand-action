@@ -21,30 +21,30 @@ from egodex_hand_action.interfaces.dataset import DatasetIndexBuilder
 
 EGODEX_LEFT_HAND_25_JOINTS: tuple[str, ...] = (
     "leftHand",
-    "leftIndexFingerTip",
-    "leftIndexFingerKnuckle",
-    "leftMiddleFingerTip",
-    "leftMiddleFingerKnuckle",
-    "leftRingFingerTip",
-    "leftRingFingerKnuckle",
-    "leftPinkyFingerTip",
-    "leftPinkyFingerKnuckle",
+    "leftThumbKnuckle",
+    "leftThumbIntermediateBase",
+    "leftThumbIntermediateTip",
     "leftThumbTip",
-    "leftThumbBase",
-    "leftThumbProximal",
-    "leftThumbIntermediate",
-    "leftThumbMetacarpal",
-    "leftThumbMetacarpalBase",
-    "leftThumbMetacarpalProximal",
-    "leftThumbMetacarpalIntermediate",
-    "leftThumbMetacarpalMetacarpal",
-    "leftThumbMetacarpalMetacarpalBase",
-    "leftThumbMetacarpalMetacarpalProximal",
-    "leftThumbMetacarpalMetacarpalIntermediate",
-    "leftThumbMetacarpalMetacarpalMetacarpal",
-    "leftThumbMetacarpalMetacarpalMetacarpalBase",
-    "leftThumbMetacarpalMetacarpalMetacarpalProximal",
-    "leftThumbMetacarpalMetacarpalMetacarpalIntermediate",
+    "leftIndexFingerMetacarpal",
+    "leftIndexFingerKnuckle",
+    "leftIndexFingerIntermediateBase",
+    "leftIndexFingerIntermediateTip",
+    "leftIndexFingerTip",
+    "leftMiddleFingerMetacarpal",
+    "leftMiddleFingerKnuckle",
+    "leftMiddleFingerIntermediateBase",
+    "leftMiddleFingerIntermediateTip",
+    "leftMiddleFingerTip",
+    "leftRingFingerMetacarpal",
+    "leftRingFingerKnuckle",
+    "leftRingFingerIntermediateBase",
+    "leftRingFingerIntermediateTip",
+    "leftRingFingerTip",
+    "leftLittleFingerMetacarpal",
+    "leftLittleFingerKnuckle",
+    "leftLittleFingerIntermediateBase",
+    "leftLittleFingerIntermediateTip",
+    "leftLittleFingerTip",
 )
 
 
@@ -264,6 +264,10 @@ def _thumb_typo_alias(name: str) -> str:
         return name.replace("Thumb", "Thunmb")
     if "Thunmb" in name:
         return name.replace("Thunmb", "Thumb")
+    if "PinkyFinger" in name:
+        return name.replace("PinkyFinger", "LittleFinger")
+    if "LittleFinger" in name:
+        return name.replace("LittleFinger", "PinkyFinger")
     return name
 
 
