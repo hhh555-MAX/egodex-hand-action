@@ -16,6 +16,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hand", choices=("left", "right"), default="left")
     parser.add_argument("--frame-root", type=Path, default=None)
     parser.add_argument("--frame-extension", default=".jpg")
+    parser.add_argument("--limit-pairs", type=int, default=None)
+    parser.add_argument("--max-frames-per-pair", type=int, default=None)
+    parser.add_argument("--progress-every", type=int, default=10)
     return parser.parse_args()
 
 
@@ -26,6 +29,9 @@ def main() -> None:
             hand=Handedness(args.hand),
             frame_root=args.frame_root,
             frame_extension=args.frame_extension,
+            limit_pairs=args.limit_pairs,
+            max_frames_per_pair=args.max_frames_per_pair,
+            progress_every=args.progress_every,
         )
     )
     paths = builder.build(args.dataset_root, args.output_dir)

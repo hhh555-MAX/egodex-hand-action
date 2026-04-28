@@ -58,6 +58,9 @@ class EgoDexHdf5ManifestConfig:
     joint_names: Sequence[str] | None = None
     manifest_filename: str = "manifest.json"
     write_split_files: bool = True
+    limit_pairs: int | None = None
+    max_frames_per_pair: int | None = None
+    progress_every: int = 10
 
 
 class EgoDexHdf5ManifestBuilder(DatasetIndexBuilder):
@@ -75,11 +78,15 @@ class EgoDexHdf5ManifestBuilder(DatasetIndexBuilder):
     def build(self, dataset_root: Path, output_dir: Path) -> Sequence[Path]:
         h5py = self._import_h5py()
         pairs = tuple(_iter_hdf5_mp4_pairs(dataset_root))
+        if self._config.limit_pairs is not None:
+            pairs = pairs[: self._config.limit_pairs]
         if not pairs:
             raise DatasetIndexError(f"No paired .hdf5/.mp4 files found under {dataset_root}.")
 
         samples: list[HandActionSample] = []
-        for hdf5_path, mp4_path in pairs:
+        for pair_index, (hdf5_path, mp4_path) in enumerate(pairs, start=1):
+            if self._should_report_progress(pair_index, len(pairs)):
+                print(f"[EgoDex] Processing pair {pair_index}/{len(pairs)}: {hdf5_path}", flush=True)
             samples.extend(
                 self._samples_from_pair(
                     h5py=h5py,
@@ -132,6 +139,8 @@ class EgoDexHdf5ManifestBuilder(DatasetIndexBuilder):
                 raise DatasetIndexError(f"HDF5 file has no 'transforms' group: {hdf5_path}")
             resolved_joint_names = _resolve_joint_names(joint_names, transforms.keys(), hdf5_path)
             frame_count = _frame_count(transforms, resolved_joint_names, hdf5_path)
+            if self._config.max_frames_per_pair is not None:
+                frame_count = min(frame_count, self._config.max_frames_per_pair)
             descriptions = _description_attrs(file.attrs)
             confidence_values = _confidence_values(file, resolved_joint_names, frame_count)
 
@@ -191,6 +200,11 @@ class EgoDexHdf5ManifestBuilder(DatasetIndexBuilder):
         if not extension.startswith("."):
             extension = f".{extension}"
         return self._config.frame_root / video_id / f"{frame_index:06d}{extension}"
+
+    def _should_report_progress(self, pair_index: int, pair_count: int) -> bool:
+        if self._config.progress_every <= 0:
+            return False
+        return pair_index == 1 or pair_index == pair_count or pair_index % self._config.progress_every == 0
 
     @staticmethod
     def _import_h5py():
