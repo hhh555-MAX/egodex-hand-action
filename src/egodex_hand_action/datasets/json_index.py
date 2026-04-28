@@ -236,6 +236,8 @@ class JsonSampleCodec:
         path = Path(str(value))
         if path.is_absolute() or base_dir is None:
             return path
+        if path.exists():
+            return path
         return base_dir / path
 
     @staticmethod
